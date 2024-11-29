@@ -7,6 +7,7 @@ const Add = ({navigation}) => {
     const [Name, setName] = useState('');
     const [type, setType] = useState('');
     const [Image, setImage] = useState('');
+    const [status, setStatus] = useState('');
 
     return (
         <View style={{ padding: 10,paddingTop:30 }}>
@@ -21,27 +22,40 @@ const Add = ({navigation}) => {
             </View>
 
             <View style={{ padding: 10 }}>
+                <Text style={{ fontWeight: 'bold' }}>Category:</Text>
                 <RNPickerSelect
                     value={type}
                     onValueChange={(value) => setType(value)}
                     items={[
-                        { label: 'Plant', value: 'Plant' },
-                        { label: 'Fire', value: 'Fire' },
-                        { label: 'Water', value: 'Water' },
+                        { label: 'School Tasks', value: 'School Tasks' },
+                        { label: 'Home Tasks', value: 'Home Tasks' },
+                        { label: 'Outdoor Tasks', value: 'Outdoor Tasks' },
+                    ]}
+                />
+            </View>
+            <View style={{ padding: 10 }}>
+                <Text style={{ fontWeight: 'bold' }}>Status:</Text>
+                <RNPickerSelect
+                    value={status}
+                    onValueChange={(value) => setStatus(value)}
+                    items={[
+                        { label: 'Completed', value: 'Completed' },
+                        { label: 'Incomplete', value: 'Incomplete' },
                     ]}
                 />
             </View>
             <Button title="SUBMIT"
                     onPress={() => {
-                        let item = {name: Name, image: Image};
+                        let item = {name: Name, image: Image, status: status};
 
                         let indexNum = 1;
-                        if (type === "Plant") {
+                        if (type === "School Tasks") {
                             indexNum = 0;
                         }
-                        else if (type === "Water") {
+                        else if (type === "Outdoor Tasks") {
                             indexNum = 2;
                         }
+
                         datasource[indexNum].data.push(item);
 
                         navigation.navigate('Home');

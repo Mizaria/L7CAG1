@@ -1,29 +1,75 @@
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View, SectionList, TouchableOpacity, Image, Button } from 'react-native';
+import { StyleSheet, Text, View, SectionList, TouchableOpacity, Image, Button, Alert } from 'react-native';
 import Icon from "react-native-vector-icons/FontAwesome6";
 import { datasource } from './Data';
 
 const Home = ({ navigation }) => {
+
+
+    const calculateCompletionPercentage = () => {
+        let totalTasks = 0;
+        let completedTasks = 0;
+
+        datasource.forEach(section => {
+            section.data.forEach(task => {
+                totalTasks++;
+                if (task.status === "Completed") {
+                    completedTasks++;
+                }
+            });
+        });
+
+        const completedPercentage = ((completedTasks / totalTasks) * 100).toFixed(2);
+        const incompletePercentage = (100 - completedPercentage).toFixed(2);
+
+        return {
+            totalTasks,
+            completedPercentage,
+            incompletePercentage,
+        };
+    };
+
+    const showTaskSummary = () => {
+        const { totalTasks, completedPercentage, incompletePercentage } = calculateCompletionPercentage();
+
+        Alert.alert(
+            "Task Summary",
+            `Total Tasks: ${totalTasks}\nCompleted: ${completedPercentage}%\nIncomplete: ${incompletePercentage}%`
+        );
+    };
 
     const renderItem = ({ item, index, section }) => {
         return (
             <TouchableOpacity
                 style={styles.itemContainer}
                 onPress={() => {
-                    navigation.navigate('Edit', { index: index, type: section.title, key: item.name, image: item.image });
+                    navigation.navigate('Edit', { index: index, type: section.title, key: item.name, image: item.image, status: item.status });
                 }}
             >
                 <Image source={{ uri: item.image }} style={styles.imageStyle} />
-                <Text style={styles.textStyle}>{item.name}</Text>
+                <View style={styles.textContainer}>
+                    <Text style={styles.textStyle}>{item.name}</Text>
+                    <Text style={styles.statusStyle}>{item.status}</Text>
+                </View>
             </TouchableOpacity>
         );
     };
 
     return (
-        <View>
+        <View style={styles.FullPage}>
+            <Text style={styles.pageTitle}>My Task Manager</Text>
+
+            {/* Add Task Button */}
             <View style={styles.buttonStyle}>
-                <Button title="Add Pokemons" onPress={() => navigation.navigate('Add')} />
+                <Button title="Add Tasks" onPress={() => navigation.navigate('Add')} color="gray" />
             </View>
+
+            {/* Task Summary Button */}
+            <View style={styles.buttonStyle}>
+                <Button title="Task Summary" onPress={showTaskSummary} color="gray" />
+            </View>
+
+            {/* Section List */}
             <SectionList
                 sections={datasource}
                 renderItem={renderItem}
@@ -39,11 +85,25 @@ const Home = ({ navigation }) => {
 }
 
 const styles = StyleSheet.create({
+    FullPage: {
+        backgroundColor: 'black',
+        flex: 1,
+    },
+    pageTitle: {
+        fontSize: 24,
+        fontWeight: 'bold',
+        textAlign: 'center',
+        marginTop: 35,
+        color: 'white',
+    },
     textStyle: {
         fontSize: 18,
         fontWeight: 'bold',
-        marginRight: 15,
-        flex: 1,
+        marginBottom: 5,
+    },
+    statusStyle: {
+        fontSize: 16,
+        color: 'blue',
     },
     headerText: {
         marginTop: 10,
@@ -51,9 +111,11 @@ const styles = StyleSheet.create({
         color: 'white',
         textAlign: 'center',
         fontWeight: 'bold',
-
-        flexDirection: 'row', // Aligns the icon and text in a row
-        alignItems: 'center',  // Vertically aligns the icon and text in the center
+        flexDirection: 'row',
+        alignItems: 'center',
+        borderWidth: 1,
+        borderColor: 'white',
+        backgroundColor: 'black',
     },
     headerTextonly: {
         fontSize: 30,
@@ -71,29 +133,30 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         borderWidth: 1,
-        borderColor: 'black',
+        borderColor: 'white',
         backgroundColor: 'lightgray',
         padding: 10,
-        marginVertical: 5, // Adds space between items
+        marginVertical: 5,
+    },
+    textContainer: {
+        flexDirection: 'column',
+        marginLeft: 15,
+        flex: 1,
     },
     buttonStyle: {
-        marginTop: 30,
-        padding: 10,
+        padding: 2,
+        marginVertical: 5,
         borderRadius: 5,
+        backgroundColor: 'white',
     },
     iconStyle: {
         marginLeft: 5,
-        marginTop:10,
-        marginRight:5,
-        marginBottom:10,
-
-
-    },
-    sectionHeader: {
-        padding: 10,
-        flexDirection: 'row',
-        alignItems: 'center',
+        marginTop: 10,
+        marginRight: 5,
+        marginBottom: 10,
     },
 });
 
 export default Home;
+
+
